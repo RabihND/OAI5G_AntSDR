@@ -30,8 +30,8 @@ FROM ubuntu:jammy AS ran-base
 ARG NEEDED_GIT_PROXY
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
-ENV BUILD_UHD_FROM_SOURCE=True
-ENV UHD_VERSION=4.4.0.0
+# ENV BUILD_UHD_FROM_SOURCE=True
+# ENV UHD_VERSION=4.4.0.0
 
 #install developers pkg/repo
 #use gcc-12 to avoid problems of default gcc-11 in FlexRIC
@@ -80,4 +80,4 @@ COPY oaienv .
 RUN /bin/sh oaienv && \ 
     cd cmake_targets && \
     mkdir -p log && \
-    ./build_oai -I -w USRP --install-optional-packages
+    ./build_oai -I -w ANTSDR --install-optional-packages

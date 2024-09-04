@@ -396,6 +396,45 @@ install_usrp_uhd_driver() {
     fi
 }
 
+install_antsdr_driver_from_source(){
+    antsdr_install_log=$OPENAIR_DIR/cmake_targets/log/antsdr_install_log.txt
+    echo_info "\nInstalling Antsdr driver from sources. The log file for Antsdr driver installation is here: $antsdr_install_log "
+    (
+    cd /tmp
+    echo "Downloading Antsdr driver"
+    rm -rf /tmp/antsdr
+    git clone https://github.com/MicroPhase/antsdr_uhd.git
+    cd antsdr_uhd/host
+    mkdir build
+    cd build
+    $CMAKE -DENABLE_X400=OFF -DENABLE_N320=OFF -DENABLE_X300=OFF -DENABLE_USRP2=OFF -DENABLE_USRP1=OFF -DENABLE_N300=OFF -DENABLE_E320=OFF -DENABLE_E300=OFF ../
+    echo "Compiling Antsdr driver"
+    make -j$(nproc)
+    $SUDO make install
+    $SUDO ldconfig
+    echo "Downloading FPGA and firmware images"
+    cd /tmp/antsdr_uhd/
+    $SUDO $INSTALLER -y install wget
+    wget --tries=3 --retry-connrefused  https://github.com/MicroPhase/antsdr_uhd/releases/download/v1.0/antsdr_u220_ad9361.bin
+    $SUDO /usr/local/bin/uhd_images_downloader -t b2*
+    mv /usr/local/share/uhd/images/usrp_b210_fpga.bin /usr/local/share/uhd/images/usrp_b210_fpga.bin.old
+    mv antsdr_u220_ad9361.bin /usr/local/share/uhd/images/usrp_b210_fpga.bin
+    ) >& $antsdr_install_log
+}
+     
+check_install_antsdr_driver(){
+    if [[ "$OS_DISTRO" == "ubuntu" ]]; then  
+        $SUDO apt-get install -y autoconf automake build-essential ccache cmake cpufrequtils doxygen ethtool \
+        g++ git inetutils-tools libboost-all-dev libncurses5 libncurses5-dev libusb-1.0-0 libusb-1.0-0-dev \
+        libusb-dev python3-dev python3-mako python3-numpy python3-requests python3-scipy python3-setuptools \
+        python3-ruamel.yaml
+    # elif [[ "$OS_BASEDISTRO" == "fedora" ]]; then
+    #     install_antsdr_driver_from_source
+    else
+        echo_error "Antsdr Installer for OAI does not support automatic build. Install Antsdr compiling sources manually from Antsdr website"
+    fi
+}
+
 install_bladerf_driver_from_source(){
     bladerf_install_log=$OPENAIR_DIR/cmake_targets/log/bladerf_install_log.txt
     echo_info "\nInstalling BladeRF driver from sources. The log file for BladeRF driver installation is here: $bladerf_install_log "

@@ -93,7 +93,7 @@ Options:
 --UE-gen-nvram [output path]
    Specify gen_nvram_path (default \"$gen_nvram_path\")
 -w | --hardware
-   USRP, BLADERF, LMSSDR, IRIS, SIMU, AW2SORI, AERIAL, None (Default)
+   USRP, ANTSDR, BLADERF, LMSSDR, IRIS, SIMU, AW2SORI, AERIAL, None (Default)
    Adds this RF board support (in external packages installation and in compilation)
 -t | --transport
    Selects the transport protocol type, options: None, Ethernet, benetel4g, benetel5g, oran_fhlib_5g
@@ -277,6 +277,9 @@ function main() {
                     HW="OAI_"$2
                     TARGET_LIST="$TARGET_LIST oai_${2,,}devif" # ,, makes lowercase
                     CMAKE_CMD="$CMAKE_CMD -DOAI_$2=ON"
+                    ;;
+                "ANTSDR")
+                     HW="OAI_"$2
                     ;;
                 "SIMU")
                     HW="OAI_"$2
@@ -467,6 +470,11 @@ function main() {
       if [ ! -v BUILD_UHD_FROM_SOURCE ] && [ ! "$DISABLE_HARDWARE_DEPENDENCY" == "True" ]; then
         install_usrp_uhd_driver $UHD_IMAGES_DIR
       fi
+    fi
+    if [ "$HW" == "OAI_ANTSDR" ] ; then
+      echo_info "installing packages for ANTSDR support"
+      check_install_antsdr_driver
+      install_antsdr_driver_from_source $UHD_IMAGES_DIR
     fi
     if [ "$HW" == "OAI_BLADERF" ] ; then
       echo_info "installing packages for BLADERF support"

@@ -37,3 +37,8 @@ add_boolean_option(OAI_USRP OFF "Activate OAI's USRP driver" OFF)
 if(OAI_USRP)
   add_subdirectory(USRP)
 endif()
+
+add_boolean_option(OAI_ANTSDR OFF "Activate OAI's ANTSDR driver" OFF)
+if(OAI_ANTSDR)
+  add_subdirectory(USRP)
+endif()
